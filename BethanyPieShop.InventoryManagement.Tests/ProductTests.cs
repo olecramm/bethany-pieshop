@@ -25,7 +25,7 @@ namespace BethanyPieShop.InventoryManagement.Tests
         public void UseProduct_ItemsHigherThanStock()
         {
             //Arrange
-            Product p1 = new RegularProduct(1, "Sugar", "Lorem ipsum", new Price() { ItemPrice = 10, Currency = Currency.Euro }, UnitType.PerKg, 100, 100);
+            Product p1 = new RegularProduct(1, "Sugar", "Lorem ipsum", new Price() { ItemPrice = 10, Currency = Currency.Euro }, UnitType.PerKg, 100, 1000);
 
             p1.IncreaseStock(10);
 
