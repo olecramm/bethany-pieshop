@@ -37,6 +37,21 @@ namespace BethanyPieShop.InventoryManagement.Tests
         }
 
         [Fact]
+        public void UseProduct_ItemsLowerThanStock()
+        {
+            //Arrange
+            Product p1 = new RegularProduct(1, "Sugar", "Lorem ipsum", new Price() { ItemPrice = 10, Currency = Currency.Euro }, UnitType.PerKg, 100, 100);
+
+            p1.IncreaseStock(10);
+
+            //Act
+            p1.UseProduct(100);
+
+            //Assert
+            Assert.Equal(0, p1.AmountInStock);
+        }
+
+        [Fact]
         public void UseProduct_Reduces_AmountInStock_StockBelowThreshold()
         {
             //Arrange
