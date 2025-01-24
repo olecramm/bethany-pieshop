@@ -186,6 +186,21 @@ namespace BethanyPieShop.InventoryManagement.db
             return product;
         }
 
+        public void UpdateProduct(Product product)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var command = new SqlCommand(
+                    "UPDATE Product SET AmountInStock = @AmountInStock WHERE ProductId = @ProductId",
+                    connection);
+                command.Parameters.AddWithValue("@AmountInStock", product.AmountInStock);
+                command.Parameters.AddWithValue("@ProductId", product.Id);
+
+                command.ExecuteNonQuery();
+            }
+        }
+
         private Product MapToProduct(SqlDataReader reader, Product product)
         {
             product.Id = reader.GetInt32(0);

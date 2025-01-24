@@ -11,6 +11,7 @@ namespace BethanyPieShop.InventoryManagement.db
         void AddProduct(T entity);
         List<T> GetAllProducts();
         T GetProductById(int id);
+        void UpdateProduct(T entity);
 
     }
 }
