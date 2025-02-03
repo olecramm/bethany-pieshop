@@ -80,8 +80,11 @@ namespace BethanyPieShop.InventoryManagement.db
 
                 using var connection = _connection.GetConnection();
                 using var command = new SqlCommand(query, connection);
+
                 connection.Open();
+
                 using var reader = command.ExecuteReader();
+
                 while (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
@@ -139,9 +142,7 @@ namespace BethanyPieShop.InventoryManagement.db
                 if (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    foundProduct = ProductFactory.CreateProduct(productType);
-
-                    MapToProduct(reader, productType);
+                    foundProduct = MapToProduct(reader, productType);
                 }
             }
             catch (SqlException ex)
