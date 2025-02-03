@@ -1,9 +1,10 @@
 ﻿using BethanyPieShop.InventoryMnagement.Domain.General;
+using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
 using System.Text;
 
-namespace BethanyPieShop.InventoryMnagement.Domain.ProductManagement
+namespace BethanyPieShop.InventoryManagement.Domain.ProductManagement
 {
-    public abstract class Product: ICloneable
+    public abstract class Product : ICloneable
     {
 
         #region Properties
@@ -61,9 +62,9 @@ namespace BethanyPieShop.InventoryMnagement.Domain.ProductManagement
         public int MaxItemInStock
         {
             get { return maxItemsInStock; }
-            set 
-            { 
-                maxItemsInStock = value; 
+            set
+            {
+                maxItemsInStock = value;
             }
         }
 
@@ -123,6 +124,7 @@ namespace BethanyPieShop.InventoryMnagement.Domain.ProductManagement
                 UpdateLowStock();
 
                 Log($"Amount in stock update. Now {AmountInStock} items in stock");
+
             }
             else
             {
@@ -226,7 +228,7 @@ namespace BethanyPieShop.InventoryMnagement.Domain.ProductManagement
             }
         }
 
-        protected void Log(string message)
+        protected static void Log(string message)
         {
 
             Console.WriteLine(message);
