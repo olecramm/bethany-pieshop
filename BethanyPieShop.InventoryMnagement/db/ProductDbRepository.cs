@@ -85,11 +85,11 @@ namespace BethanyPieShop.InventoryManagement.db
                 while (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    var product = ProductFactory.CreateProduct(productType);
+                    //var product = ProductFactory.CreateProduct(productType);
 
-                    MapToProduct(reader, product);
+                    var productMapped = MapToProduct(reader, productType);
 
-                    entities.Add(product);
+                    entities.Add(productMapped);
                 }
             }
             catch (SqlException ex)
@@ -142,7 +142,7 @@ namespace BethanyPieShop.InventoryManagement.db
                     var productType = reader.GetInt32(7);
                     foundProduct = ProductFactory.CreateProduct(productType);
 
-                    MapToProduct(reader, foundProduct);
+                    MapToProduct(reader, productType);
                 }
             }
             catch (SqlException ex)
@@ -186,8 +186,10 @@ namespace BethanyPieShop.InventoryManagement.db
             command.ExecuteNonQuery();
         }
 
-        private static Product MapToProduct(SqlDataReader reader, Product product)
+        private static Product MapToProduct(SqlDataReader reader, int productType)
         {
+            var product = ProductFactory.CreateProduct(productType);
+
             product.Id = reader.GetInt32(0);
             product.Name = reader.GetString(1);
             product.Description = reader.GetString(2);
