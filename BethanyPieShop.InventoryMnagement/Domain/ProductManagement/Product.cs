@@ -1,5 +1,5 @@
-﻿using BethanyPieShop.InventoryMnagement.Domain.General;
-using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
+﻿using BethanyPieShop.InventoryManagement.Domain.General;
+using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using System.Text;
 
 namespace BethanyPieShop.InventoryManagement.Domain.ProductManagement

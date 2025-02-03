@@ -1,4 +1,4 @@
-﻿using BethanyPieShop.InventoryMnagement.Domain.General;
+﻿using BethanyPieShop.InventoryManagement.Domain.General;
 
 namespace BethanyPieShop.InventoryManagement.Domain.ProductManagement
 {

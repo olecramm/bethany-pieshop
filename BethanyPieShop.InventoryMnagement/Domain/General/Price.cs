@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BethanyPieShop.InventoryMnagement.Domain.General
+namespace BethanyPieShop.InventoryManagement.Domain.General
 {
     public class Price
     {

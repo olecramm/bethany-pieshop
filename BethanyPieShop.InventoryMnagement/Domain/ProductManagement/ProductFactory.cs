@@ -1,10 +1,4 @@
-﻿using BethanyPieShop.InventoryMnagement.Domain.General;
-using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BethanyPieShop.InventoryManagement.Domain.General;
 
 namespace BethanyPieShop.InventoryManagement.Domain.ProductManagement
 {

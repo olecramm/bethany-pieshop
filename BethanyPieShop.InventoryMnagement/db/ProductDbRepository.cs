@@ -1,6 +1,6 @@
 ﻿using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
-using BethanyPieShop.InventoryMnagement.Domain.General;
-using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
+using BethanyPieShop.InventoryManagement.Domain.General;
+using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -85,7 +85,6 @@ namespace BethanyPieShop.InventoryManagement.db
                 while (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    //var product = ProductFactory.CreateProduct(productType);
 
                     var productMapped = MapToProduct(reader, productType);
 
