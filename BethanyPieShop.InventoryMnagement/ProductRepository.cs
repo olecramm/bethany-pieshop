@@ -4,12 +4,12 @@ using BethanyPieShop.InventoryMnagement.Domain.General;
 using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
 using System.Text;
 
-namespace BethanyPieShop.InventoryMnagement
+namespace BethanyPieShop.InventoryManagement
 {
     internal class ProductRepository
     {
-        private string directory = @"C:\iecourses\";
-        private string productFileName = "products.txt";
+        private readonly string directory = @"C:\iecourses\";
+        private readonly string productFileName = "products.txt";
 
         private void CheckForExistingProductFile()
         {
@@ -26,10 +26,10 @@ namespace BethanyPieShop.InventoryMnagement
             }
         }
 
-        public List<Product> LoadProductFromFile()
+        public List<Product> LoadProductFromFile(Product? product)
         {
 
-            List<Product> products = new List<Product>();
+            List<Product> products = [];
 
             string path = Path.Combine(directory, productFileName);
 
@@ -82,7 +82,7 @@ namespace BethanyPieShop.InventoryMnagement
 
                     string productType = productSplits[7];
 
-                    Product? product = null;
+                    Product? currentProduct = null;
 
                     switch (productType)
                     {
@@ -93,26 +93,26 @@ namespace BethanyPieShop.InventoryMnagement
                                 amountPerBox = 1;
                             }
 
-                            product = new BoxedProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency}, amountInStock, amountPerBox, 0);
+                            currentProduct = new BoxedProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, amountInStock, amountPerBox, 0);
                             break;
 
                         case "2":
-                            product = new FreshProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency}, unitType, amountInStock, 0);
+                            currentProduct = new FreshProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, amountInStock, 0);
                             break;
 
                         case "3":
-                            product = new BulkProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, amountInStock, 0);
+                            currentProduct = new BulkProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, amountInStock, 0);
                             break;
-                        
+
                         case "4":
-                            product = new RegularProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, amountInStock, 0);
+                            currentProduct = new RegularProduct(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, amountInStock, 0);
                             break;
 
                     }
 
                     //Product product = new Product(productId, name, descreption, new Price() { ItemPrice = itemPrice, Currency = currency }, unitType, maxItemInStock);
 
-                    products.Add(product);
+                    products.Add(currentProduct);
                 }
             }
             catch (IndexOutOfRangeException iex)
@@ -144,10 +144,11 @@ namespace BethanyPieShop.InventoryMnagement
 
         public void SaveToFile(List<ISavable> savables)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             string path = $"{directory}{productFileName}";
 
-            foreach (var item in savables) { 
+            foreach (var item in savables)
+            {
                 sb.Append(item.ConvertToStringForSaving());
                 sb.Append(Environment.NewLine);
             }

@@ -1,5 +1,4 @@
 ﻿using BethanyPieShop.InventoryMnagement.Domain.General;
-using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;

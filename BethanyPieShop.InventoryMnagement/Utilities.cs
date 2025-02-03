@@ -7,14 +7,14 @@ using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BethanyPieShop.InventoryMnagement
+namespace BethanyPieShop.InventoryManagement
 {
     internal class Utilities
     {
 
-        private static List<Product> inventory = new();
-        private static List<Order> orders = new();
-        private static ProductDbRepository productDbRepository = new(ConfigurationBuilder());
+        private static List<Product> inventory = [];
+        private static readonly List<Order> orders = [];
+        private static readonly ProductDbRepository productDbRepository = new(ConfigurationBuilder());
 
 
         internal static void InitializeStock()
@@ -24,9 +24,9 @@ namespace BethanyPieShop.InventoryMnagement
             //bp.IncreaseStock(100);
             //bp.UseProduct(10);
 
-            ProductRepository productRepository = new();
+            //ProductRepository productRepository = new();
 
-            inventory = productRepository.LoadProductFromFile();
+            //inventory = productRepository.LoadProductFromFile(product);
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Loaded {inventory.Count} products");
@@ -107,7 +107,7 @@ namespace BethanyPieShop.InventoryMnagement
         {
             ProductRepository productRepository = new();
 
-            List<ISavable> savables = new List<ISavable>();
+            List<ISavable> savables = [];
 
             foreach (var item in inventory)
             {
@@ -179,8 +179,7 @@ namespace BethanyPieShop.InventoryMnagement
 
         private static void ShowOrderManagementMenu()
         {
-            string? userSelection = string.Empty;
-
+            string? userSelection;
             do
             {
                 Console.ResetColor();
@@ -216,7 +215,7 @@ namespace BethanyPieShop.InventoryMnagement
 
         private static void ShowAddNewOrder()
         {
-            Order newOrder = new Order();
+            Order newOrder = new();
             string? selectedProductId = string.Empty;
 
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -241,7 +240,7 @@ namespace BethanyPieShop.InventoryMnagement
                         Console.Write("How many do you want to order?: ");
                         int amountOrdered = int.Parse(Console.ReadLine() ?? "0");
 
-                        OrderItem orderItem = new OrderItem
+                        OrderItem orderItem = new()
                         {
                             ProductId = selectedProduct.Id,
                             ProductName = selectedProduct.Name,
@@ -385,9 +384,8 @@ namespace BethanyPieShop.InventoryMnagement
             Console.WriteLine("1. Regular product\n2. Bulk product\n3. Fresk product\n4. Boxed product");
             Console.WriteLine("Your selection: ");
 
-            int productType;
 
-            if (!int.TryParse(Console.ReadLine(), out productType))
+            if (!int.TryParse(Console.ReadLine(), out int productType))
             {
 
                 Console.WriteLine("Invalid selection");
@@ -469,7 +467,7 @@ namespace BethanyPieShop.InventoryMnagement
 
         private static bool IsExistentProductType(int productType)
         {
-            if(productType >= 1 && productType <= 4) 
+            if (productType >= 1 && productType <= 4)
                 return true;
 
             return false;
@@ -531,10 +529,7 @@ namespace BethanyPieShop.InventoryMnagement
                     {
                         Product? selectedProduct = inventory.Where(p => p.Id == orderItem.ProductId).FirstOrDefault();
 
-                        if (selectedProduct != null)
-                        {
-                            selectedProduct.IncreaseStock(orderItem.AmountOrdered);
-                        }
+                        selectedProduct?.IncreaseStock(orderItem.AmountOrdered);
                     }
 
                     order.Fulfilled = true;
@@ -548,15 +543,12 @@ namespace BethanyPieShop.InventoryMnagement
 
         private static void ShowDetailsAndUseProduct()
         {
-            string? userSelection = String.Empty;
-
             Console.WriteLine("Enter de ID of the product");
-            int selectedProductId;
 
-            if (int.TryParse(Console.ReadLine(), out selectedProductId))
+            if (int.TryParse(Console.ReadLine(), out int selectedProductId))
             {
 
-                Product? selectedProduct =  productDbRepository.GetProductById(selectedProductId);
+                Product? selectedProduct = productDbRepository.GetProductById(selectedProductId);
                 // inventory.Where(p => p.Id == int.Parse(selectedProductId)).FirstOrDefault();
 
                 if (selectedProduct != null)
@@ -570,7 +562,7 @@ namespace BethanyPieShop.InventoryMnagement
                     Console.WriteLine("0: Back to inventory overview");
 
                     Console.Write("Your selection: ");
-                    userSelection = Console.ReadLine();
+                    string? userSelection = Console.ReadLine();
 
                     if (userSelection == "1")
                     {
@@ -578,6 +570,8 @@ namespace BethanyPieShop.InventoryMnagement
                         int amount = int.Parse(Console.ReadLine() ?? "0");
 
                         selectedProduct.UseProduct(amount);
+
+                        productDbRepository.UpdateProduct(selectedProduct);
 
                         Console.ReadLine();
                     }

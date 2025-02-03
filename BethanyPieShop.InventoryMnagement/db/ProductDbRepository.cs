@@ -16,7 +16,7 @@ namespace BethanyPieShop.InventoryManagement.db
         public ProductDbRepository(IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException(nameof(_connectionString));
             _connection = new DatabaseConnection(_connectionString);
         }
 
@@ -27,21 +27,19 @@ namespace BethanyPieShop.InventoryManagement.db
                 var query = "INSERT INTO Product (Name, Description, AmountInStock, Price, CurrencyID, UnitTypeID, ProductTypeID, MaxAmountInStock) " +
                     "        VALUES (@Name, @Description, @AmountInStock, @Price, @CurrencyID, @UnitTypeID, @ProductTypeID, @MaxAmountInStock)";
 
-                using (var connection = _connection.GetConnection())
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Name", entity.Name);
-                    command.Parameters.AddWithValue("@Description", entity.Description);
-                    command.Parameters.AddWithValue("@AmountInStock", entity.AmountInStock);
-                    command.Parameters.AddWithValue("@Price", entity.Price.ItemPrice);
-                    command.Parameters.AddWithValue("@CurrencyID", (int)entity.Price.Currency);
-                    command.Parameters.AddWithValue("@UnitTypeID", (int)entity.UnitType);
-                    command.Parameters.AddWithValue("@ProductTypeID", entity.ProductType);
-                    command.Parameters.AddWithValue("@MaxAmountInStock", entity.MaxItemInStock);
+                using var connection = _connection.GetConnection();
+                using var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Name", entity.Name);
+                command.Parameters.AddWithValue("@Description", entity.Description);
+                command.Parameters.AddWithValue("@AmountInStock", entity.AmountInStock);
+                command.Parameters.AddWithValue("@Price", entity.Price.ItemPrice);
+                command.Parameters.AddWithValue("@CurrencyID", (int)entity.Price.Currency);
+                command.Parameters.AddWithValue("@UnitTypeID", (int)entity.UnitType);
+                command.Parameters.AddWithValue("@ProductTypeID", entity.ProductType);
+                command.Parameters.AddWithValue("@MaxAmountInStock", entity.MaxItemInStock);
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                connection.Open();
+                command.ExecuteNonQuery();
 
             }
             catch (SqlException ex)
@@ -80,22 +78,18 @@ namespace BethanyPieShop.InventoryManagement.db
             {
                 var query = "SELECT ProductID, Name, Description, AmountInStock, Price, CurrencyID, UnitTypeID, ProductTypeID, MaxAmountInStock FROM Product";
 
-                using (var connection = _connection.GetConnection())
-                using (var command = new SqlCommand(query, connection))
+                using var connection = _connection.GetConnection();
+                using var command = new SqlCommand(query, connection);
+                connection.Open();
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var productType = reader.GetInt32(7);
-                            var product = ProductFactory.CreateProduct(productType);
+                    var productType = reader.GetInt32(7);
+                    var product = ProductFactory.CreateProduct(productType);
 
-                            MapToProduct(reader, product);
+                    MapToProduct(reader, product);
 
-                            entities.Add(product);
-                        }
-                    }
+                    entities.Add(product);
                 }
             }
             catch (SqlException ex)
@@ -129,33 +123,26 @@ namespace BethanyPieShop.InventoryManagement.db
 
         public Product GetProductById(int id)
         {
-            Product? product = null;
+            Product? foundProduct = null;
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using SqlConnection connection = new(_connectionString);
+                string query = "SELECT ProductID, Name, Description, AmountInStock, Price, CurrencyID, UnitTypeID, ProductTypeID, MaxAmountInStock FROM Product WHERE ProductID = @Id ";
+
+                using SqlCommand command = new(query, connection);
+                command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int) { Value = id });
+
+                connection.Open();
+
+                using SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
                 {
-                    string query = "SELECT ProductID, Name, Description, AmountInStock, Price, CurrencyID, UnitTypeID, ProductTypeID, MaxAmountInStock FROM Product WHERE ProductID = @Id ";
+                    var productType = reader.GetInt32(7);
+                    foundProduct = ProductFactory.CreateProduct(productType);
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int) { Value = id });
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-
-                            if (reader.Read())
-                            {
-                                var productType = reader.GetInt32(7);
-                                product = ProductFactory.CreateProduct(productType);
-
-                                MapToProduct(reader, product);
-                            }
-
-                        }
-                    }
+                    MapToProduct(reader, foundProduct);
                 }
             }
             catch (SqlException ex)
@@ -183,10 +170,23 @@ namespace BethanyPieShop.InventoryManagement.db
                 // Handle all other exceptions
                 Console.WriteLine($"Unexpected Error: {ex.Message}");
             }
-            return product;
+            return foundProduct ?? throw new InvalidOperationException("Product not found");
         }
 
-        private Product MapToProduct(SqlDataReader reader, Product product)
+        public void UpdateProduct(Product product)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+            var command = new SqlCommand(
+                "UPDATE Product SET AmountInStock = @AmountInStock WHERE ProductId = @ProductId",
+                connection);
+            command.Parameters.AddWithValue("@AmountInStock", product.AmountInStock);
+            command.Parameters.AddWithValue("@ProductId", product.Id);
+
+            command.ExecuteNonQuery();
+        }
+
+        private static Product MapToProduct(SqlDataReader reader, Product product)
         {
             product.Id = reader.GetInt32(0);
             product.Name = reader.GetString(1);
