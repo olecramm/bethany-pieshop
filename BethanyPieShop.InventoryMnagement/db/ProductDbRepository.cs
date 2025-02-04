@@ -1,6 +1,6 @@
 ﻿using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
-using BethanyPieShop.InventoryMnagement.Domain.General;
-using BethanyPieShop.InventoryMnagement.Domain.ProductManagement;
+using BethanyPieShop.InventoryManagement.Domain.General;
+using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -80,16 +80,18 @@ namespace BethanyPieShop.InventoryManagement.db
 
                 using var connection = _connection.GetConnection();
                 using var command = new SqlCommand(query, connection);
+
                 connection.Open();
+
                 using var reader = command.ExecuteReader();
+
                 while (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    var product = ProductFactory.CreateProduct(productType);
 
-                    MapToProduct(reader, product);
+                    var productMapped = MapToProduct(reader, productType);
 
-                    entities.Add(product);
+                    entities.Add(productMapped);
                 }
             }
             catch (SqlException ex)
@@ -140,9 +142,7 @@ namespace BethanyPieShop.InventoryManagement.db
                 if (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    foundProduct = ProductFactory.CreateProduct(productType);
-
-                    MapToProduct(reader, foundProduct);
+                    foundProduct = MapToProduct(reader, productType);
                 }
             }
             catch (SqlException ex)
@@ -186,8 +186,10 @@ namespace BethanyPieShop.InventoryManagement.db
             command.ExecuteNonQuery();
         }
 
-        private static Product MapToProduct(SqlDataReader reader, Product product)
+        private static Product MapToProduct(SqlDataReader reader, int productType)
         {
+            var product = ProductFactory.CreateProduct(productType);
+
             product.Id = reader.GetInt32(0);
             product.Name = reader.GetString(1);
             product.Description = reader.GetString(2);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BethanyPieShop.InventoryMnagement.Domain.OrderManagement
+namespace BethanyPieShop.InventoryManagement.Domain.OrderManagement
 {
     public class OrderItem
     {
