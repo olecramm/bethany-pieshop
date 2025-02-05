@@ -1,5 +1,4 @@
-﻿using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
-using BethanyPieShop.InventoryManagement.Domain.General;
+﻿using BethanyPieShop.InventoryManagement.Domain.General;
 using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -7,20 +6,19 @@ using System.Data;
 
 namespace BethanyPieShop.InventoryManagement.db
 {
-    public class ProductDbRepository : IRepository<Product>
+    public class SqlRepository : IDataRepository<Product>
     {
         private readonly IConfiguration _configuration;
         private readonly string? _connectionString;
         private readonly DatabaseConnection _connection;
 
-        public ProductDbRepository(IConfiguration configuration)
+        public SqlRepository()
         {
-            _configuration = configuration;
+            _configuration = Configuration.Build();
             _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException(nameof(_connectionString));
             _connection = new DatabaseConnection(_connectionString);
         }
-
-        public void AddProduct(Product entity)
+        public void AddProduct(Product product)
         {
             try
             {
@@ -29,14 +27,14 @@ namespace BethanyPieShop.InventoryManagement.db
 
                 using var connection = _connection.GetConnection();
                 using var command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Name", entity.Name);
-                command.Parameters.AddWithValue("@Description", entity.Description);
-                command.Parameters.AddWithValue("@AmountInStock", entity.AmountInStock);
-                command.Parameters.AddWithValue("@Price", entity.Price.ItemPrice);
-                command.Parameters.AddWithValue("@CurrencyID", (int)entity.Price.Currency);
-                command.Parameters.AddWithValue("@UnitTypeID", (int)entity.UnitType);
-                command.Parameters.AddWithValue("@ProductTypeID", entity.ProductType);
-                command.Parameters.AddWithValue("@MaxAmountInStock", entity.MaxItemInStock);
+                command.Parameters.AddWithValue("@Name", product.Name);
+                command.Parameters.AddWithValue("@Description", product.Description);
+                command.Parameters.AddWithValue("@AmountInStock", product.AmountInStock);
+                command.Parameters.AddWithValue("@Price", product.Price.ItemPrice);
+                command.Parameters.AddWithValue("@CurrencyID", (int)product.Price.Currency);
+                command.Parameters.AddWithValue("@UnitTypeID", (int)product.UnitType);
+                command.Parameters.AddWithValue("@ProductTypeID", product.ProductType);
+                command.Parameters.AddWithValue("@MaxAmountInStock", product.MaxItemInStock);
 
                 connection.Open();
                 command.ExecuteNonQuery();
@@ -72,7 +70,7 @@ namespace BethanyPieShop.InventoryManagement.db
         public List<Product> GetAllProducts()
         {
 
-            var entities = new List<Product>();
+            var productList = new List<Product>();
 
             try
             {
@@ -91,7 +89,7 @@ namespace BethanyPieShop.InventoryManagement.db
 
                     var productMapped = MapToProduct(reader, productType);
 
-                    entities.Add(productMapped);
+                    productList.Add(productMapped);
                 }
             }
             catch (SqlException ex)
@@ -120,7 +118,7 @@ namespace BethanyPieShop.InventoryManagement.db
                 Console.WriteLine($"Unexpected Error: {ex.Message}");
             }
 
-            return entities;
+            return productList;
         }
 
         public Product GetProductById(int id)

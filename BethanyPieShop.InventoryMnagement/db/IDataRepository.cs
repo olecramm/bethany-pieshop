@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace BethanyPieShop.InventoryManagement.db
 {
-    public interface IRepository<T>
+    public interface IReadOnlyRepository<T>
     {
-        void AddProduct(T entity);
         List<T> GetAllProducts();
         T GetProductById(int id);
-        void UpdateProduct(T entity);
+    }
 
+    public interface IWriteRepository<T>
+    {
+        void AddProduct(T entity);
+        void UpdateProduct(T entity);
+    }
+
+    public interface IDataRepository<T> : IReadOnlyRepository<T>, IWriteRepository<T>
+    {
     }
 }
