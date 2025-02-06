@@ -1,10 +1,9 @@
 ﻿using BethanyPieShop.InventoryManagement.Domain.Contracts;
 using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using BethanyPieShop.InventoryManagement.Domain.General;
-using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using System.Text;
 
-namespace BethanyPieShop.InventoryManagement
+namespace BethanyPieShop.InventoryManagement.Infrastructure.Data
 {
     internal class ProductRepository
     {

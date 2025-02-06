@@ -1,20 +1,19 @@
-﻿using BethanyPieShop.InventoryManagement.db;
-using BethanyPieShop.InventoryManagement.Domain.Contracts;
+﻿using BethanyPieShop.InventoryManagement.Domain.Contracts;
 using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using BethanyPieShop.InventoryManagement.Domain.General;
 using BethanyPieShop.InventoryManagement.Domain.OrderManagement;
-using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using BethanyPieShop.InventoryManagement.Infrastructure.Data;
 
-namespace BethanyPieShop.InventoryManagement
+namespace BethanyPieShop.InventoryManagement.Presentation
 {
     internal class Utilities
     {
 
         private static List<Product> inventory = [];
         private static readonly List<Order> orders = [];
-        private static readonly ProductDbRepository productDbRepository = new(ConfigurationBuilder());
+        private static readonly IDataRepository<Product> _ProductDataRepository = new SqlRepository();
+
 
 
         internal static void InitializeStock()
@@ -27,14 +26,6 @@ namespace BethanyPieShop.InventoryManagement
             //ProductRepository productRepository = new();
 
             //inventory = productRepository.LoadProductFromFile(product);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Loaded {inventory.Count} products");
-
-            Console.WriteLine("Press enter to continue!.");
-            Console.ResetColor();
-
-            Console.ReadLine();
 
             //Product p1 = new Product(1) { 
             //    Name = "Sugar", 
@@ -460,7 +451,7 @@ namespace BethanyPieShop.InventoryManagement
             }
             if (newProduct != null)
             {
-                productDbRepository.AddProduct(newProduct);
+                _ProductDataRepository.AddProduct(newProduct);
                 //inventory.Add(newProduct);
             }
         }
@@ -548,7 +539,7 @@ namespace BethanyPieShop.InventoryManagement
             if (int.TryParse(Console.ReadLine(), out int selectedProductId))
             {
 
-                Product? selectedProduct = productDbRepository.GetProductById(selectedProductId);
+                Product? selectedProduct = _ProductDataRepository.GetProductById(selectedProductId);
                 // inventory.Where(p => p.Id == int.Parse(selectedProductId)).FirstOrDefault();
 
                 if (selectedProduct != null)
@@ -571,7 +562,7 @@ namespace BethanyPieShop.InventoryManagement
 
                         selectedProduct.UseProduct(amount);
 
-                        productDbRepository.UpdateProduct(selectedProduct);
+                        _ProductDataRepository.UpdateProduct(selectedProduct);
 
                         Console.ReadLine();
                     }
@@ -595,27 +586,13 @@ namespace BethanyPieShop.InventoryManagement
         {
             inventory.Clear();
 
-            inventory = productDbRepository.GetAllProducts();
+            inventory = _ProductDataRepository.GetAllProducts();
 
             foreach (var product in inventory)
             {
                 Console.WriteLine(product.DisplayDetailsShort());
                 Console.WriteLine();
             }
-        }
-
-        private static IConfiguration ConfigurationBuilder()
-        {
-            string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-
-            string? rootPath = Directory.GetParent(currentPath)?.Parent?.Parent?.Parent?.FullName;
-
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(rootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            return configuration;
         }
     }
 }
