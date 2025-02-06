@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 //Console.WriteLine("Hello, World!");
 
+using BethanyPieShop.InventoryManagement.Infrastructure.Logging;
 using BethanyPieShop.InventoryManagement.Presentation;
 
 PrintWelcome();
@@ -36,6 +37,8 @@ static void PrintWelcome()
     Console.ResetColor();
 
     Console.WriteLine("Press enter key to start loggin in");
+
+    LogManager.Instance.WriteLog("Application started");
 
     Console.ReadLine();
 
