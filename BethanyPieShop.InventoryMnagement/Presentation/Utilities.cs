@@ -1,18 +1,18 @@
-﻿using BethanyPieShop.InventoryManagement.db;
-using BethanyPieShop.InventoryManagement.Domain.Contracts;
+﻿using BethanyPieShop.InventoryManagement.Domain.Contracts;
 using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
 using BethanyPieShop.InventoryManagement.Domain.General;
 using BethanyPieShop.InventoryManagement.Domain.OrderManagement;
 using Microsoft.IdentityModel.Tokens;
+using BethanyPieShop.InventoryManagement.Infrastructure.Data;
 
-namespace BethanyPieShop.InventoryManagement
+namespace BethanyPieShop.InventoryManagement.Presentation
 {
     internal class Utilities
     {
 
         private static List<Product> inventory = [];
         private static readonly List<Order> orders = [];
-        private static readonly IDataRepository<Product> _ProductDataRepository = new SqlRepository(); 
+        private static readonly IDataRepository<Product> _ProductDataRepository = new SqlRepository();
 
 
 

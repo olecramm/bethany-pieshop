@@ -1,23 +1,26 @@
-﻿using BethanyPieShop.InventoryManagement.Domain.General;
-using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
+﻿using BethanyPieShop.InventoryManagement.Domain.ProductManagement;
+using BethanyPieShop.InventoryManagement.Infrastructure.Mappers;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace BethanyPieShop.InventoryManagement.db
+namespace BethanyPieShop.InventoryManagement.Infrastructure.Data
 {
     public class SqlRepository : IDataRepository<Product>
     {
         private readonly IConfiguration _configuration;
         private readonly string? _connectionString;
         private readonly DatabaseConnection _connection;
+        private readonly ProductMapper _productMapper;
 
         public SqlRepository()
         {
             _configuration = Configuration.Build();
             _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException(nameof(_connectionString));
             _connection = new DatabaseConnection(_connectionString);
+            _productMapper = new ProductMapper();
         }
+
         public void AddProduct(Product product)
         {
             try
@@ -87,7 +90,7 @@ namespace BethanyPieShop.InventoryManagement.db
                 {
                     var productType = reader.GetInt32(7);
 
-                    var productMapped = MapToProduct(reader, productType);
+                    var productMapped = _productMapper.Map(reader, productType);
 
                     productList.Add(productMapped);
                 }
@@ -140,7 +143,7 @@ namespace BethanyPieShop.InventoryManagement.db
                 if (reader.Read())
                 {
                     var productType = reader.GetInt32(7);
-                    foundProduct = MapToProduct(reader, productType);
+                    foundProduct = _productMapper.Map(reader, productType);
                 }
             }
             catch (SqlException ex)
@@ -182,23 +185,6 @@ namespace BethanyPieShop.InventoryManagement.db
             command.Parameters.AddWithValue("@ProductId", product.Id);
 
             command.ExecuteNonQuery();
-        }
-
-        private static Product MapToProduct(SqlDataReader reader, int productType)
-        {
-            var product = ProductFactory.CreateProduct(productType);
-
-            product.Id = reader.GetInt32(0);
-            product.Name = reader.GetString(1);
-            product.Description = reader.GetString(2);
-            product.AmountInStock = reader.GetInt32(3);
-            product.Price.ItemPrice = (double)(reader.GetDecimal(4));
-            product.Price.Currency = (Currency)reader.GetInt32(5);
-            product.UnitType = (UnitType)reader.GetInt32(6);
-            product.ProductType = reader.GetInt32(7);
-            product.MaxItemInStock = reader.GetInt32(8);
-
-            return product;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace BethanyPieShop.InventoryManagement.db
+namespace BethanyPieShop.InventoryManagement.Infrastructure.Data
 {
     public class DatabaseConnection
     {
@@ -11,10 +11,11 @@ namespace BethanyPieShop.InventoryManagement.db
             _coonectionString = connectionString;
         }
 
-        public SqlConnection GetConnection() { 
+        public SqlConnection GetConnection()
+        {
 
             return new SqlConnection(_coonectionString);
-            
+
         }
     }
 }
