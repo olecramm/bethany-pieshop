@@ -1,1 +1,1 @@
-# BethanyPieShop.InventoryMnagement# bethany-pieshop
+# BethanyPieShop.InventoryManagement# bethany-pieshop

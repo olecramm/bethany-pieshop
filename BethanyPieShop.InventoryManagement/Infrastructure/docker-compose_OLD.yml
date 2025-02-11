@@ -3,14 +3,14 @@ version: '3.8'
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    container_name: bethany-mssql
     ports:
       - "1433:1433" # Exposes the SQL Server port to the host
     environment:
       ACCEPT_EULA: "Y"         # Accepts the SQL Server EULA
       SA_PASSWORD: "YourPassword123"  # Sets the SA (admin) user password
     volumes:
-      - sql_data:/var/opt/mssql    # Persist SQL Server data
+      - mssql_data:/var/opt/mssql    # Persist SQL Server data
       - ./init-scripts:/init-scripts # Mounts the initialization scripts
     entrypoint: >
       /bin/bash -c "
@@ -20,8 +20,25 @@ services:
         echo Running $file;
         /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourPassword123 -i $file;
       done;
-      wait
-      "
+      wait "
+    networks:
+      - bethany-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bethany-app
+    depends_on:
+      - mssql
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=BethanyPieShop;User Id=SA;Password=YourPassword123;Encrypt=False;"
+    networks:
+      - bethany-network
+    restart: unless-stopped
+
+networks:
+  bethany-network:
 
 volumes:
-  sql_data: # Named volume for SQL Server data
+  mssql_data: # Named volume for SQL Server data
